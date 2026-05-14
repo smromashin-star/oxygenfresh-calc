@@ -1,0 +1,1145 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Калькулятор монтажа | OxygenFresh</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+  
+  :root {
+    --primary: #4F46E5;
+    --primary-dark: #4338CA;
+    --accent: #10B981;
+    --danger: #EF4444;
+    --bg: #F8FAFC;
+    --card: #FFFFFF;
+    --text: #1E293B;
+    --text-light: #64748B;
+    --border: #E2E8F0;
+    --shadow: 0 4px 20px rgba(0,0,0,0.08);
+    --shadow-lg: 0 10px 40px rgba(0,0,0,0.12);
+  }
+  
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  
+  body {
+    font-family: 'Inter', -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+  
+  /* ====== КАЛЬКУЛЯТОР ====== */
+  .of-calc {
+    width: 100%;
+    max-width: 420px;
+    background: var(--card);
+    border-radius: 20px;
+    box-shadow: var(--shadow-lg);
+    overflow: hidden;
+    border: 1px solid var(--border);
+  }
+  
+  .of-calc__header {
+    background: linear-gradient(135deg, #667EEA 0%, #764BA2 100%);
+    color: #fff;
+    padding: 20px 24px;
+    position: relative;
+  }
+  
+  .of-calc__header::after {
+    content: '';
+    position: absolute;
+    bottom: -1px;
+    left: 0;
+    right: 0;
+    height: 20px;
+    background: var(--card);
+    border-radius: 20px 20px 0 0;
+  }
+  
+  .of-calc__badge {
+    display: inline-block;
+    background: rgba(255,255,255,0.2);
+    backdrop-filter: blur(10px);
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 8px;
+  }
+  
+  .of-calc__title {
+    font-size: 18px;
+    font-weight: 700;
+    line-height: 1.3;
+  }
+  
+  .of-calc__subtitle {
+    font-size: 13px;
+    opacity: 0.9;
+    margin-top: 4px;
+  }
+  
+  .of-calc__body {
+    padding: 0 24px 24px;
+  }
+  
+  /* ====== СЕКЦИИ ====== */
+  .of-calc__section {
+    margin-bottom: 18px;
+    padding-bottom: 18px;
+    border-bottom: 1px dashed var(--border);
+  }
+  
+  .of-calc__section:last-of-type {
+    border-bottom: none;
+    margin-bottom: 0;
+  }
+  
+  .of-calc__step {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 12px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-light);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  
+  .of-calc__step-num {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #667EEA, #764BA2);
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  
+  .of-calc__label {
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 8px;
+    display: block;
+    color: var(--text);
+  }
+  
+  /* ====== РАДИО / ЧИПЫ ====== */
+  .of-calc__chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  
+  .of-calc__chip {
+    position: relative;
+  }
+  
+  .of-calc__chip input {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+  }
+  
+  .of-calc__chip label {
+    display: block;
+    padding: 8px 14px;
+    border-radius: 10px;
+    border: 2px solid var(--border);
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    background: var(--card);
+    color: var(--text);
+    user-select: none;
+  }
+  
+  .of-calc__chip label:hover {
+    border-color: var(--primary);
+    background: #EEF2FF;
+  }
+  
+  .of-calc__chip input:checked + label {
+    border-color: var(--primary);
+    background: linear-gradient(135deg, #667EEA, #764BA2);
+    color: #fff;
+    box-shadow: 0 2px 8px rgba(79,70,229,0.3);
+  }
+  
+  /* ====== ПОЛЗУНОК / ЧИСЛО ====== */
+  .of-calc__input-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  
+  .of-calc__range {
+    flex: 1;
+    -webkit-appearance: none;
+    appearance: none;
+    height: 6px;
+    border-radius: 3px;
+    background: var(--border);
+    outline: none;
+  }
+  
+  .of-calc__range::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #667EEA, #764BA2);
+    cursor: pointer;
+    box-shadow: 0 2px 6px rgba(79,70,229,0.4);
+    border: 2px solid #fff;
+  }
+  
+  .of-calc__number {
+    width: 70px;
+    padding: 8px 10px;
+    border: 2px solid var(--border);
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    text-align: center;
+    color: var(--text);
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  
+  .of-calc__number:focus {
+    border-color: var(--primary);
+  }
+  
+  .of-calc__unit {
+    font-size: 12px;
+    color: var(--text-light);
+    margin-left: 2px;
+  }
+  
+  .of-calc__km-price {
+    font-size: 12px;
+    color: var(--text-light);
+    margin-top: 4px;
+  }
+  
+  .of-calc__km-price span {
+    color: var(--primary);
+    font-weight: 600;
+  }
+  
+  /* ====== ЧЕКБОКСЫ ====== */
+  .of-calc__checks {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .of-calc__check {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 14px;
+    border-radius: 10px;
+    border: 2px solid var(--border);
+    cursor: pointer;
+    transition: all 0.2s;
+    font-size: 13px;
+    font-weight: 500;
+    user-select: none;
+  }
+  
+  .of-calc__check:hover {
+    border-color: var(--primary);
+    background: #EEF2FF;
+  }
+  
+  .of-calc__check input {
+    width: 18px;
+    height: 18px;
+    accent-color: var(--primary);
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+  
+  .of-calc__check-price {
+    margin-left: auto;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--accent);
+    background: rgba(16,185,129,0.1);
+    padding: 2px 8px;
+    border-radius: 6px;
+  }
+  
+  .of-calc__check input:checked ~ .of-calc__check-price {
+    background: rgba(16,185,129,0.2);
+  }
+  
+  /* ====== КОЛИЧЕСТВО ПРИБОРОВ ====== */
+  .of-calc__qty {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  
+  .of-calc__qty-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    border: 2px solid var(--border);
+    background: var(--card);
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--primary);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    user-select: none;
+  }
+  
+  .of-calc__qty-btn:hover {
+    border-color: var(--primary);
+    background: #EEF2FF;
+  }
+  
+  .of-calc__qty-value {
+    font-size: 22px;
+    font-weight: 700;
+    min-width: 40px;
+    text-align: center;
+    color: var(--text);
+  }
+  
+  .of-calc__qty-label {
+    font-size: 12px;
+    color: var(--text-light);
+    margin-top: 2px;
+  }
+  
+  .of-calc__discount {
+    margin-top: 6px;
+    font-size: 12px;
+    padding: 6px 10px;
+    border-radius: 8px;
+    background: #FEF3C7;
+    color: #92400E;
+    font-weight: 600;
+    display: none;
+  }
+  
+  .of-calc__discount.active {
+    display: block;
+  }
+  
+  /* ====== ИТОГО ====== */
+  .of-calc__result {
+    background: linear-gradient(135deg, #1E293B 0%, #334155 100%);
+    border-radius: 16px;
+    padding: 18px 20px;
+    color: #fff;
+    margin-bottom: 16px;
+  }
+  
+  .of-calc__result-label {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    opacity: 0.7;
+    margin-bottom: 4px;
+  }
+  
+  .of-calc__result-price {
+    font-size: 32px;
+    font-weight: 700;
+    line-height: 1.2;
+  }
+  
+  .of-calc__result-price .rub { font-size: 20px; }
+  
+  .of-calc__result-detail {
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid rgba(255,255,255,0.15);
+    font-size: 12px;
+    opacity: 0.8;
+    line-height: 1.8;
+  }
+  
+  .of-calc__result-detail .d {
+    display: flex;
+    justify-content: space-between;
+  }
+  
+  .of-calc__result-detail .d-total {
+    font-weight: 700;
+    margin-top: 4px;
+    padding-top: 4px;
+    border-top: 1px solid rgba(255,255,255,0.15);
+    font-size: 13px;
+  }
+  
+  .of-calc__result-detail .d-discount {
+    color: #FBBF24;
+    font-weight: 600;
+  }
+  
+  /* ====== КНОПКА ====== */
+  .of-calc__btn {
+    width: 100%;
+    padding: 14px 20px;
+    border-radius: 12px;
+    border: none;
+    background: linear-gradient(135deg, #667EEA 0%, #764BA2 100%);
+    color: #fff;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: 0 4px 14px rgba(79,70,229,0.35);
+    font-family: inherit;
+  }
+  
+  .of-calc__btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 20px rgba(79,70,229,0.45);
+  }
+  
+  .of-calc__btn:active {
+    transform: translateY(0);
+  }
+  
+  .of-calc__btn-sub {
+    text-align: center;
+    font-size: 12px;
+    color: var(--text-light);
+    margin-top: 8px;
+  }
+  
+  .of-calc__btn-sub span {
+    color: var(--accent);
+    font-weight: 500;
+  }
+  
+  /* ====== МОДАЛКА ====== */
+  .of-modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    backdrop-filter: blur(4px);
+    z-index: 9999;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+  
+  .of-modal-overlay.active { display: flex; }
+  
+  .of-modal {
+    background: var(--card);
+    border-radius: 20px;
+    width: 100%;
+    max-width: 400px;
+    box-shadow: var(--shadow-lg);
+    animation: modalIn 0.3s ease;
+    overflow: hidden;
+  }
+  
+  @keyframes modalIn {
+    from { opacity: 0; transform: scale(0.95) translateY(10px); }
+    to { opacity: 1; transform: scale(1) translateY(0); }
+  }
+  
+  .of-modal__header {
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .of-modal__title {
+    font-size: 16px;
+    font-weight: 700;
+  }
+  
+  .of-modal__close {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    border: none;
+    background: var(--bg);
+    cursor: pointer;
+    font-size: 18px;
+    color: var(--text-light);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+  }
+  
+  .of-modal__close:hover {
+    background: var(--border);
+    color: var(--text);
+  }
+  
+  .of-modal__body {
+    padding: 20px 24px;
+  }
+  
+  .of-modal__summary {
+    background: var(--bg);
+    border-radius: 12px;
+    padding: 14px;
+    margin-bottom: 16px;
+    font-size: 13px;
+    line-height: 1.7;
+  }
+  
+  .of-modal__summary-row {
+    display: flex;
+    justify-content: space-between;
+  }
+  
+  .of-modal__summary-total {
+    font-weight: 700;
+    font-size: 15px;
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 2px solid var(--border);
+    color: var(--primary);
+  }
+  
+  .of-form__group {
+    margin-bottom: 14px;
+  }
+  
+  .of-form__label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 6px;
+    color: var(--text);
+  }
+  
+  .of-form__input {
+    width: 100%;
+    padding: 12px 14px;
+    border: 2px solid var(--border);
+    border-radius: 10px;
+    font-size: 14px;
+    font-family: inherit;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  
+  .of-form__input:focus {
+    border-color: var(--primary);
+  }
+  
+  .of-form__radio-group {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 14px;
+  }
+  
+  .of-form__radio {
+    flex: 1;
+  }
+  
+  .of-form__radio input {
+    display: none;
+  }
+  
+  .of-form__radio label {
+    display: block;
+    text-align: center;
+    padding: 10px;
+    border: 2px solid var(--border);
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  
+  .of-form__radio input:checked + label {
+    border-color: var(--primary);
+    background: #EEF2FF;
+    color: var(--primary);
+    font-weight: 600;
+  }
+  
+  .of-form__submit {
+    width: 100%;
+    padding: 14px;
+    border-radius: 12px;
+    border: none;
+    background: linear-gradient(135deg, #667EEA 0%, #764BA2 100%);
+    color: #fff;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.2s;
+  }
+  
+  .of-form__submit:hover {
+    opacity: 0.9;
+  }
+  
+  .of-form__submit:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+  
+  .of-modal__success {
+    display: none;
+    text-align: center;
+    padding: 30px 24px;
+  }
+  
+  .of-modal__success-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #10B981, #059669);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 16px;
+    font-size: 28px;
+  }
+  
+  .of-modal__success-title {
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+  
+  .of-modal__success-text {
+    font-size: 14px;
+    color: var(--text-light);
+    line-height: 1.6;
+  }
+  
+  /* ====== АНИМАЦИИ ЦЕНЫ ====== */
+  @keyframes pricePulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+  }
+  
+  .of-calc__result-price.updating {
+    animation: pricePulse 0.3s ease;
+  }
+  
+  /* ====== АДАПТИВ ====== */
+  @media (max-width: 480px) {
+    .of-calc { max-width: 100%; }
+    .of-calc__body { padding: 0 16px 20px; }
+    .of-calc__header { padding: 16px 20px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ====== КАЛЬКУЛЯТОР ====== -->
+<div class="of-calc" id="ofCalc">
+  
+  <div class="of-calc__header">
+    <div class="of-calc__badge">Онлайн-расчет</div>
+    <div class="of-calc__title">Калькулятор монтажа</div>
+    <div class="of-calc__subtitle">Рассчитайте стоимость установки за 30 секунд</div>
+  </div>
+  
+  <div class="of-calc__body">
+    
+    <!-- ШАГ 1: Локация -->
+    <div class="of-calc__section">
+      <div class="of-calc__step">
+        <span class="of-calc__step-num">1</span>
+        <span>Место установки</span>
+      </div>
+      <div class="of-calc__chips" id="locationGroup">
+        <div class="of-calc__chip">
+          <input type="radio" name="location" id="locCity" value="city" checked onchange="calc()">
+          <label for="locCity">Екатеринбург (+10 км)</label>
+        </div>
+        <div class="of-calc__chip">
+          <input type="radio" name="location" id="locFar" value="far" onchange="calc()">
+          <label for="locFar">За город</label>
+        </div>
+      </div>
+      <div id="kmBlock" style="margin-top:12px; display:none;">
+        <div class="of-calc__input-group">
+          <input type="range" class="of-calc__range" id="kmRange" min="20" max="150" value="20" oninput="syncKm(this.value)">
+          <input type="number" class="of-calc__number" id="kmInput" min="20" max="150" value="20" oninput="syncKm(this.value)">
+          <span class="of-calc__unit">км</span>
+        </div>
+        <div class="of-calc__km-price">Цена выезда: <span id="kmPrice">500</span> руб. (60 руб/км)</div>
+      </div>
+    </div>
+    
+    <!-- ШАГ 2: Тип стены -->
+    <div class="of-calc__section">
+      <div class="of-calc__step">
+        <span class="of-calc__step-num">2</span>
+        <span>Тип стены</span>
+      </div>
+      <div class="of-calc__chips">
+        <div class="of-calc__chip">
+          <input type="radio" name="wall" id="wallFrame" value="7000" checked onchange="calc()">
+          <label for="wallFrame">Каркас / СИП</label>
+        </div>
+        <div class="of-calc__chip">
+          <input type="radio" name="wall" id="wallBlock" value="8000" onchange="calc()">
+          <label for="wallBlock">Блок / Кирпич</label>
+        </div>
+        <div class="of-calc__chip">
+          <input type="radio" name="wall" id="wallMono" value="9000" onchange="calc()">
+          <label for="wallMono">Монолит / Брус</label>
+        </div>
+      </div>
+    </div>
+    
+    <!-- ШАГ 3: Дополнительно -->
+    <div class="of-calc__section">
+      <div class="of-calc__step">
+        <span class="of-calc__step-num">3</span>
+        <span>Дополнительно</span>
+      </div>
+      <div class="of-calc__checks">
+        <label class="of-calc__check">
+          <input type="checkbox" id="optHeight" onchange="calc()">
+          <span>Высота монтажа &gt; 180 см</span>
+          <span class="of-calc__check-price">+1 000 руб.</span>
+        </label>
+        <label class="of-calc__check">
+          <input type="checkbox" id="optElectro" onchange="calc()">
+          <span>Скрытое электроподключение</span>
+          <span class="of-calc__check-price">+500 руб.</span>
+        </label>
+        <label class="of-calc__check">
+          <input type="checkbox" id="optThick" onchange="calc()">
+          <span>Толщина стены &gt; 500 мм</span>
+          <span class="of-calc__check-price">+1 000 руб.</span>
+        </label>
+      </div>
+    </div>
+    
+    <!-- ШАГ 4: Количество -->
+    <div class="of-calc__section">
+      <div class="of-calc__step">
+        <span class="of-calc__step-num">4</span>
+        <span>Количество приборов</span>
+      </div>
+      <div class="of-calc__qty">
+        <button class="of-calc__qty-btn" onclick="changeQty(-1)">&minus;</button>
+        <div>
+          <div class="of-calc__qty-value" id="qtyValue">1</div>
+          <div class="of-calc__qty-label">прибор</div>
+        </div>
+        <button class="of-calc__qty-btn" onclick="changeQty(1)">+</button>
+      </div>
+      <div class="of-calc__discount" id="discountInfo">
+        Скидка на монтаж: <span id="discountPercent">0</span>%
+      </div>
+    </div>
+    
+    <!-- ИТОГО -->
+    <div class="of-calc__result">
+      <div class="of-calc__result-label">Стоимость монтажа</div>
+      <div class="of-calc__result-price" id="resultPrice">
+        7 500 <span class="rub">руб.</span>
+      </div>
+      <div class="of-calc__result-detail" id="resultDetail">
+        <div class="d"><span>Выезд бригады:</span><span>500 руб.</span></div>
+        <div class="d"><span>Монтаж (Каркас/СИП):</span><span>7 000 руб.</span></div>
+      </div>
+    </div>
+    
+    <!-- КНОПКА -->
+    <button class="of-calc__btn" onclick="openModal()">
+      Оставить заявку на монтаж
+    </button>
+    <div class="of-calc__btn-sub">Результат отправим в <span>Telegram</span> или на <span>Email</span></div>
+    
+  </div>
+</div>
+
+<!-- ====== МОДАЛКА ЗАЯВКИ ====== -->
+<div class="of-modal-overlay" id="modalOverlay" onclick="if(event.target===this)closeModal()">
+  <div class="of-modal">
+    
+    <!-- Форма -->
+    <div id="modalForm">
+      <div class="of-modal__header">
+        <span class="of-modal__title">Заявка на монтаж</span>
+        <button class="of-modal__close" onclick="closeModal()">&times;</button>
+      </div>
+      <div class="of-modal__body">
+        
+        <div class="of-modal__summary" id="modalSummary"></div>
+        
+        <div class="of-form__group">
+          <label class="of-form__label">Куда отправить расчет?</label>
+          <div class="of-form__radio-group">
+            <div class="of-form__radio">
+              <input type="radio" name="sendTo" id="sendTelegram" value="telegram" checked>
+              <label for="sendTelegram">Telegram</label>
+            </div>
+            <div class="of-form__radio">
+              <input type="radio" name="sendTo" id="sendEmail" value="email">
+              <label for="sendEmail">Email</label>
+            </div>
+          </div>
+        </div>
+        
+        <div class="of-form__group" id="contactGroup">
+          <label class="of-form__label" for="contactInput" id="contactLabel">Ник в Telegram / Телефон</label>
+          <input type="text" class="of-form__input" id="contactInput" placeholder="@username или +7...">
+        </div>
+        
+        <div class="of-form__group">
+          <label class="of-form__label" for="nameInput">Ваше имя</label>
+          <input type="text" class="of-form__input" id="nameInput" placeholder="Алексей">
+        </div>
+        
+        <button class="of-form__submit" id="submitBtn" onclick="submitForm()">
+          Отправить заявку
+        </button>
+      </div>
+    </div>
+    
+    <!-- Успех -->
+    <div class="of-modal__success" id="modalSuccess">
+      <div class="of-modal__success-icon">&#10003;</div>
+      <div class="of-modal__success-title">Заявка отправлена!</div>
+      <div class="of-modal__success-text">
+        Мы получили ваш расчет и свяжемся с вами в ближайшее время для уточнения деталей.
+      </div>
+    </div>
+    
+  </div>
+</div>
+
+<script>
+// ====== STATE ======
+let qty = 1;
+let currentTotal = 7500;
+
+// ====== CALCULATION ======
+function calc() {
+  const location = document.querySelector('input[name="location"]:checked').value;
+  const wallPrice = parseInt(document.querySelector('input[name="wall"]:checked').value);
+  const kmBlock = document.getElementById('kmBlock');
+  
+  // Show/hide km input
+  if (location === 'far') {
+    kmBlock.style.display = 'block';
+  } else {
+    kmBlock.style.display = 'none';
+  }
+  
+  // 1. Location price
+  let locationPrice = 500;
+  if (location === 'far') {
+    const km = parseInt(document.getElementById('kmInput').value) || 20;
+    locationPrice = km * 60;
+    document.getElementById('kmPrice').textContent = locationPrice.toLocaleString('ru');
+  }
+  
+  // 2. Wall type
+  const wallNames = {
+    '7000': 'Каркас/СИП',
+    '8000': 'Блок/Кирпич',
+    '9000': 'Монолит/Брус'
+  };
+  
+  // 3. Options
+  let optionsPrice = 0;
+  const optHeight = document.getElementById('optHeight').checked;
+  const optElectro = document.getElementById('optElectro').checked;
+  const optThick = document.getElementById('optThick').checked;
+  
+  if (optHeight) optionsPrice += 1000;
+  if (optElectro) optionsPrice += 500;
+  if (optThick) optionsPrice += 1000;
+  
+  // 4. Quantity & discount
+  const basePerUnit = locationPrice + wallPrice + optionsPrice;
+  const baseTotal = basePerUnit * qty;
+  
+  let discountPercent = 0;
+  if (qty >= 2 && qty <= 3) discountPercent = 5;
+  else if (qty >= 4 && qty <= 6) discountPercent = 10;
+  else if (qty > 6) discountPercent = 15;
+  
+  const discountAmount = Math.round(baseTotal * discountPercent / 100);
+  const finalTotal = baseTotal - discountAmount;
+  currentTotal = finalTotal;
+  
+  // ====== RENDER RESULT ======
+  const priceEl = document.getElementById('resultPrice');
+  priceEl.innerHTML = finalTotal.toLocaleString('ru') + ' <span class="rub">руб.</span>';
+  priceEl.classList.add('updating');
+  setTimeout(() => priceEl.classList.remove('updating'), 300);
+  
+  // Detail breakdown
+  let detailHTML = '';
+  detailHTML += `<div class="d"><span>Выезд бригады:</span><span>${locationPrice.toLocaleString('ru')} руб.</span></div>`;
+  detailHTML += `<div class="d"><span>Монтаж (${wallNames[wallPrice]}):</span><span>${(wallPrice * qty).toLocaleString('ru')} руб.</span></div>`;
+  if (optionsPrice > 0) {
+    detailHTML += `<div class="d"><span>Доп. опции:</span><span>${(optionsPrice * qty).toLocaleString('ru')} руб.</span></div>`;
+  }
+  if (qty > 1) {
+    detailHTML += `<div class="d"><span>Количество приборов:</span><span>&times;${qty}</span></div>`;
+  }
+  if (discountPercent > 0) {
+    detailHTML += `<div class="d d-discount"><span>Скидка ${discountPercent}%:</span><span>&minus;${discountAmount.toLocaleString('ru')} руб.</span></div>`;
+  }
+  detailHTML += `<div class="d d-total"><span>Итого:</span><span>${finalTotal.toLocaleString('ru')} руб.</span></div>`;
+  document.getElementById('resultDetail').innerHTML = detailHTML;
+  
+  // Discount badge
+  const discountEl = document.getElementById('discountInfo');
+  if (discountPercent > 0) {
+    discountEl.classList.add('active');
+    document.getElementById('discountPercent').textContent = discountPercent;
+  } else {
+    discountEl.classList.remove('active');
+  }
+}
+
+// ====== KM SYNC ======
+function syncKm(val) {
+  val = Math.max(20, Math.min(150, parseInt(val) || 20));
+  document.getElementById('kmRange').value = val;
+  document.getElementById('kmInput').value = val;
+  calc();
+}
+
+// ====== QTY ======
+function changeQty(delta) {
+  qty = Math.max(1, Math.min(50, qty + delta));
+  document.getElementById('qtyValue').textContent = qty;
+  const labels = ['прибор', 'прибора', 'приборов'];
+  const labelEl = document.querySelector('.of-calc__qty-label');
+  if (qty === 1) labelEl.textContent = labels[0];
+  else if (qty >= 2 && qty <= 4) labelEl.textContent = labels[1];
+  else labelEl.textContent = labels[2];
+  calc();
+}
+
+// ====== MODAL ======
+function openModal() {
+  const summary = document.getElementById('resultDetail').innerHTML;
+  document.getElementById('modalSummary').innerHTML = summary;
+  document.getElementById('modalOverlay').classList.add('active');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeModal() {
+  document.getElementById('modalOverlay').classList.remove('active');
+  document.body.style.overflow = '';
+  // Reset form after animation
+  setTimeout(() => {
+    document.getElementById('modalForm').style.display = 'block';
+    document.getElementById('modalSuccess').style.display = 'none';
+    document.getElementById('contactInput').value = '';
+    document.getElementById('nameInput').value = '';
+  }, 300);
+}
+
+// ====== SEND TO ======
+document.querySelectorAll('input[name="sendTo"]').forEach(r => {
+  r.addEventListener('change', function() {
+    const label = document.getElementById('contactLabel');
+    const input = document.getElementById('contactInput');
+    if (this.value === 'telegram') {
+      label.textContent = 'Ник в Telegram / Телефон';
+      input.placeholder = '@username или +7...';
+    } else {
+      label.textContent = 'Email адрес';
+      input.placeholder = 'mail@example.com';
+    }
+  });
+});
+
+// ====== SUBMIT ======
+async function submitForm() {
+  const contact = document.getElementById('contactInput').value.trim();
+  const name = document.getElementById('nameInput').value.trim();
+  const sendTo = document.querySelector('input[name="sendTo"]:checked').value;
+  const btn = document.getElementById('submitBtn');
+  
+  if (!contact) {
+    alert('Пожалуйста, укажите контакт для связи');
+    return;
+  }
+  
+  btn.disabled = true;
+  btn.textContent = 'Отправка...';
+  
+  // ====== GATHER DATA ======
+  const location = document.querySelector('input[name="location"]:checked').value;
+  const wallPrice = parseInt(document.querySelector('input[name="wall"]:checked').value);
+  const wallNames = {'7000':'Каркас/СИП','8000':'Блок/Кирпич','9000':'Монолит/Брус'};
+  
+  let locationText = 'Екатеринбург (+10 км)';
+  let locationPrice = 500;
+  if (location === 'far') {
+    const km = document.getElementById('kmInput').value;
+    locationText = `За город (${km} км)`;
+    locationPrice = km * 60;
+  }
+  
+  const options = [];
+  if (document.getElementById('optHeight').checked) options.push('Высота >180см (+1000р)');
+  if (document.getElementById('optElectro').checked) options.push('Скрытая электрика (+500р)');
+  if (document.getElementById('optThick').checked) options.push('Стена >500мм (+1000р)');
+  
+  let discountPercent = 0;
+  if (qty >= 2 && qty <= 3) discountPercent = 5;
+  else if (qty >= 4 && qty <= 6) discountPercent = 10;
+  else if (qty > 6) discountPercent = 15;
+  
+  const data = {
+    name: name || 'Не указано',
+    contact: contact,
+    sendTo: sendTo,
+    location: locationText,
+    locationPrice: locationPrice,
+    wallType: wallNames[wallPrice],
+    wallPrice: wallPrice,
+    options: options.length ? options.join(', ') : 'Нет',
+    optionsPrice: (document.getElementById('optHeight').checked ? 1000 : 0) +
+                  (document.getElementById('optElectro').checked ? 500 : 0) +
+                  (document.getElementById('optThick').checked ? 1000 : 0),
+    qty: qty,
+    discount: discountPercent,
+    total: currentTotal,
+    timestamp: new Date().toLocaleString('ru-RU'),
+    source: window.location.href
+  };
+  
+  console.log('=== ДАННЫЕ ДЛЯ ОТПРАВКИ ===', data);
+  
+  // ====== ЗДЕСЬ ПОДКЛЮЧАЕТЕ ОТПРАВКУ ======
+  // Раскомментируйте нужный вариант:
+  
+  // --- ВАРИАНТ 1: Telegram Bot API ---
+  // await sendToTelegram(data);
+  
+  // --- ВАРИАНТ 2: Email (Formspree) ---
+  // await sendToEmail(data);
+  
+  // --- ВАРИАНТ 3: Google Sheets ---
+  // await sendToGoogleSheets(data);
+  
+  // Имитация задержки для демо
+  await new Promise(r => setTimeout(r, 800));
+  
+  // Show success
+  document.getElementById('modalForm').style.display = 'none';
+  document.getElementById('modalSuccess').style.display = 'block';
+  btn.disabled = false;
+  btn.textContent = 'Отправить заявку';
+}
+
+// ====== ОТПРАВКА В TELEGRAM ======
+async function sendToTelegram(data) {
+  // 1. Создайте бота через @BotFather, получите TOKEN
+  // 2. Узнайте свой CHAT_ID через @userinfobot
+  const BOT_TOKEN = 'ВАШ_ТОКЕН';
+  const CHAT_ID = 'ВАШ_CHAT_ID';
+  
+  const text = `
+📋 <b>Новая заявка на монтаж</b>
+
+👤 Имя: ${data.name}
+📞 Контакт: ${data.contact}
+📍 Место: ${data.location}
+🧱 Стена: ${data.wallType}
+⚙️ Опции: ${data.options}
+🔢 Приборов: ${data.qty}
+💰 Скидка: ${data.discount}%
+💵 <b>Итого: ${data.total.toLocaleString('ru')} руб.</b>
+
+🌐 Источник: ${data.source}
+🕐 ${data.timestamp}
+  `.trim();
+  
+  await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      chat_id: CHAT_ID,
+      text: text,
+      parse_mode: 'HTML'
+    })
+  });
+}
+
+// ====== ОТПРАВКА НА EMAIL (через Formspree) ======
+async function sendToEmail(data) {
+  // Зарегистрируйтесь на formspree.io, создайте форму, получите ID
+  const FORMSPREE_ID = 'ВАШ_ID';
+  
+  await fetch(`https://formspree.io/f/${FORMSPREE_ID}`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      name: data.name,
+      contact: data.contact,
+      message: `
+Заявка на монтаж:
+- Место: ${data.location}
+- Стена: ${data.wallType}
+- Опции: ${data.options}
+- Приборов: ${data.qty}
+- Скидка: ${data.discount}%
+- Итого: ${data.total.toLocaleString('ru')} руб.
+      `.trim()
+    })
+  });
+}
+
+// ====== GOOGLE SHEETS (через Apps Script) ======
+async function sendToGoogleSheets(data) {
+  // Создайте Google Apps Script Web App, получите URL
+  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz5e_sfpFJNVeqa8reLMZywIxfRJHZghq8KC7hsJizINAm_ayXjrnLbem_4oJprur_trA/exec';
+  
+  await fetch(SCRIPT_URL, {
+    method: 'POST',
+    body: JSON.stringify(data)
+  });
+}
+
+// ====== INIT ======
+calc();
+</script>
+
+</body>
+</html>
